@@ -1,11 +1,4 @@
-starting workers
-starting test
 Thread, # threads, Test type, Test #, Time (s)
-Worker 3 started
-Worker 1 started
-Worker 2 started
-Worker 0 started
-Worker 4 started
 2, 5, Read, 0, 0.009620357
 0, 5, sync_write_read, 0, 0.014365164
 1, 5, Read, 0, 0.017944460
@@ -45006,4 +44999,3 @@ Worker 4 started
 0, 5, sync_write_read, 4997, 0.024036436
 0, 5, sync_write_read, 4998, 0.023939217
 0, 5, sync_write_read, 4999, 0.023930558
-All workers joined

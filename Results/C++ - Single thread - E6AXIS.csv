@@ -1,5 +1,3 @@
-starting workers
-starting test
 Thread, # threads, Test type, e6axis, Test #, Time (s)
 0, 1, Read, 1, 0, 0.003777576
 0, 1, Read, 1, 1, 0.002609968
@@ -15001,4 +14999,3 @@ Thread, # threads, Test type, e6axis, Test #, Time (s)
 0, 1, sync_write_read, 1, 4997, 0.023896615
 0, 1, sync_write_read, 1, 4998, 0.023974208
 0, 1, sync_write_read, 1, 4999, 0.023682411
-All workers joined

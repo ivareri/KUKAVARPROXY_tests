@@ -1,17 +1,7 @@
-thread nr: 0
-thread nr: 3
-Starting tests
-thread nr: 2
-Starting tests
-Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
-thread nr: 1
-Starting tests
-Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
-thread nr: 4
-Starting tests
 Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
 Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
-Starting tests
+Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
+Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
 Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
 4, 5, Read, true, 0, 0.004899227
 2, 5, Read, true, 0, 0.006967227
@@ -21672,17 +21662,13 @@ Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
 3, 5, Write, true, 2496, 0.013862447
 0, 5, sync_write_read, true, 1665, 0.047860416
 2, 5, Write, true, 2499, 0.014220733
-Disconnected
 1, 5, Write, true, 2497, 0.017170689
 4, 5, Write, true, 2499, 0.017617883
-Disconnected
 3, 5, Write, true, 2497, 0.01704281
 1, 5, Write, true, 2498, 0.011824269
 3, 5, Write, true, 2498, 0.009612954
 1, 5, Write, true, 2499, 0.011171462
-Disconnected
 3, 5, Write, true, 2499, 0.010443926
-Disconnected
 0, 5, sync_write_read, true, 1666, 0.036937798
 0, 5, sync_write_read, true, 1667, 0.020084188
 0, 5, sync_write_read, true, 1668, 0.023651192
@@ -22517,9 +22503,6 @@ Disconnected
 0, 5, sync_write_read, true, 2497, 0.023802259
 0, 5, sync_write_read, true, 2498, 0.024813281
 0, 5, sync_write_read, true, 2499, 0.023615923
-Disconnected
-thread nr: 0
-Starting tests
 Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
 0, 5, sync_write_read, true, 25000, 0.029126818
 0, 5, sync_write_read, true, 25001, 0.021445045
@@ -22644,17 +22627,9 @@ Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
 0, 5, sync_write_read, true, 2500120, 0.02372215
 0, 5, sync_write_read, true, 2500121, 0.023874125
 0, 5, sync_write_read, true, 2500122, 0.023384259
-thread nr: 3
-Starting tests
 Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
-thread nr: 2
-Starting tests
 Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
-thread nr: 4
-Starting tests
 Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
-thread nr: 1
-Starting tests
 Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
 3, 5, Read, true, 25000, 0.012278097
 0, 5, sync_write_read, true, 2500123, 0.024418119
@@ -44317,16 +44292,12 @@ Thread, #Threads, Test type, E6AXIS, Test #, Time (s)
 2, 5, Write, true, 25002497, 0.016899565
 4, 5, Write, true, 25002497, 0.016238657
 3, 5, Write, true, 25002499, 0.017007191
-Disconnected
 1, 5, Write, true, 25002498, 0.015060085
 2, 5, Write, true, 25002498, 0.017090302
 4, 5, Write, true, 25002498, 0.017412899
 1, 5, Write, true, 25002499, 0.013643634
-Disconnected
 2, 5, Write, true, 25002499, 0.011892155
-Disconnected
 4, 5, Write, true, 25002499, 0.011988117
-Disconnected
 0, 5, sync_write_read, true, 25001790, 0.037702141
 0, 5, sync_write_read, true, 25001791, 0.010482129
 0, 5, sync_write_read, true, 25001792, 0.021674195
@@ -45037,4 +45008,3 @@ Disconnected
 0, 5, sync_write_read, true, 25002497, 0.02337923
 0, 5, sync_write_read, true, 25002498, 0.023621719
 0, 5, sync_write_read, true, 25002499, 0.025077631
-Disconnected
