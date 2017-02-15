@@ -147,6 +147,7 @@ public:
 //		 for (int i = 0; i != recLen; ++i){
 //			std::cout << recblock[i];
 //  		}
+		recblock.erase(recblock.end()-7,recblock.end());
 		return recblock;
 	}
 	// Function for terminating the socket and thus disconnect from server:
