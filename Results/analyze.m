@@ -1,11 +1,11 @@
 clear all;
 
 %filename = 'C++ - single thread - E6AXIS';
-%filename = 'C++ - single thread - INT'; %% fail
+%filename = 'C++ - single thread - INT';
 %filename = 'Java - single thread - E6AXIS';
 %filename = 'Java - single thread - INT'; %% fail
 %filename = 'C++ - 5 thread - E6AXIS';
-%filename = 'C++ - 5 thread - INT'; %% fail
+%filename = 'C++ - 5 thread - INT';
 %filename = 'Java - 5 thread - E6AXIS';
 %filename = 'Java - 5 thread - INT';
 
