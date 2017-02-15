@@ -10,32 +10,24 @@ public class RunTest {
 	private CrossComClient client = null;
 	
 	public void testAll(int rounds, int t_id, int t_num, Boolean e6axis) {
-		System.out.println("Starting tests");
-		System.out.println("Thread, #Threads, Test type, E6AXIS, Test #, Time (s)");
-		
 		// Read test
 		if ((t_id != 0) || (t_num == 1)) {
 			for (int i = 0; i < rounds; i++) {
-				System.out.println(t_id + ", " + t_num + ", Read, " + e6axis + ", " + 2500+i + ", " + timedRead(e6axis));
+				System.out.println(t_id + ", " + t_num + ", Read, " + (e6axis ? 1 : 0) + ", " + i + ", " + timedRead(e6axis));
 			}
 		}
 
 		// Write test
 		if ((t_id != 0) || (t_num == 1)) {
 			for (int i = 0; i < rounds; i++) {
-				System.out.println(t_id + ", " + t_num + ", Write, " + e6axis + ", " + 2500+i + ", " + timedWrite(e6axis, i));
+				System.out.println(t_id + ", " + t_num + ", Write, " + (e6axis ? 1 : 0) + ", " + i + ", " + timedWrite(e6axis, i));
 			}
 		}
 		
 		// Synced write-read test
 		if ((t_id == 0)) {
-			Boolean hack = e6axis;
-			
-			if (t_num >= 2)
-				hack = true;
-			
 			for (int i = 0; i < rounds; i++) {
-				System.out.println(t_id + ", " + t_num + ", sync_write_read, " + e6axis + ", " + 2500+i + ", " + syncWriteRead(hack, i));
+				System.out.println(t_id + ", " + t_num + ", sync_write_read, " + (e6axis ? 1 : 0) + ", " + i + ", " + syncWriteRead(e6axis, i));
 			}		
 		}
 	}
@@ -74,10 +66,10 @@ public class RunTest {
 	}
 	
 	public double syncWriteRead(Boolean e6axis, int round) {
-		KRLInt write_int = new KRLInt("test1");
-		KRLInt read_int = new KRLInt("test2");
-		KRLE6Axis write_e6axis = new KRLE6Axis("axis_set");
-		KRLE6Axis read_e6axis = new KRLE6Axis("axis_test");
+		KRLInt write_int = new KRLInt("test1x");
+		KRLInt read_int = new KRLInt("test2x");
+		KRLE6Axis write_e6axis = new KRLE6Axis("axis_setx");
+		KRLE6Axis read_e6axis = new KRLE6Axis("axis_testx");
 		
 		write_int.setValue(round);
 		write_e6axis.setA1ToA6(0.0, (double) round, 0.0, 0.0, 0.0, 0.0);
