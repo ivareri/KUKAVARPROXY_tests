@@ -45,7 +45,7 @@ public abstract class KRLVariable {
 
     public KRLVariable(String name) {
         this.name = name;
-        this.id = idFactory.getAndIncrement();
+        this.id = idFactory.getAndIncrement() % 65536;
     }
 
     /**
@@ -65,6 +65,15 @@ public abstract class KRLVariable {
      */
     public String getName() {
         return name;
+    }
+    
+    /**
+    * Return the Type of Variable that implements this class
+    *
+    * @return the Type of variable that implements this class
+    */
+    public String getType(){
+        return this.getClass().getSimpleName();
     }
 
     /**
@@ -102,7 +111,7 @@ public abstract class KRLVariable {
      */
     public void update(int id, String strValue, long readTime) {
         if (this.id != id) {
-            throw new RuntimeException("The returned id does not match the variable id! Should not happen...");
+            throw new RuntimeException("The returned id (" + id + ") does not match the variable id (" + this.id + ")! Should not happen...");
         }
         this.readTime = readTime;
         setValueFromString(strValue);
@@ -118,7 +127,7 @@ public abstract class KRLVariable {
         List<Byte> header = new ArrayList<>();
         List<Byte> block = new ArrayList<>();
 
-        byte hbyte = (byte) ((cmd.length & 0xFF00) >> 8);
+        byte hbyte = (byte) ((cmd.length & 0xff00)>>8);
         byte lbyte = (byte) (cmd.length & 0x00ff);
 
         int index = 0;
@@ -128,10 +137,10 @@ public abstract class KRLVariable {
         for (int i = 0; i < cmd.length; i++) {
             block.add(index++, cmd[i]);
         }
-        hbyte = (byte) ((block.size() & 0xff00) >> 8);
+        hbyte = (byte) ((block.size() & 0xff00)>>8);
         lbyte = (byte) (block.size() & 0x00ff);
 
-        byte hbytemsg = (byte) ((id & 0xff00) >> 8);
+        byte hbytemsg = (byte) ((id & 0xff00)>>8);
         byte lbytemsg = (byte) (id & 0x00ff);
 
         index = 0;
@@ -156,7 +165,7 @@ public abstract class KRLVariable {
         List<Byte> header = new ArrayList<>();
         List<Byte> block = new ArrayList<>();
 
-        byte hbyte = (byte) ((cmd.length & 0xff00) >> 8);
+        byte hbyte = (byte) ((cmd.length & 0xff00)>>8);
         byte lbyte = (byte) (cmd.length & 0x00ff);
 
         int index = 0;
@@ -167,7 +176,7 @@ public abstract class KRLVariable {
             block.add(index++, cmd[i]);
         }
 
-        hbyte = (byte) ((value.length  & 0xff00) >> 8);
+        hbyte = (byte) ((value.length & 0xff00)>>8);
         lbyte = (byte) (value.length & 0x00ff);
 
         block.add(index++, hbyte);
@@ -176,10 +185,10 @@ public abstract class KRLVariable {
             block.add(index++, value[i]);
         }
 
-        hbyte = (byte) ((block.size()  & 0xff00) >> 8);
+        hbyte = (byte) ((block.size() & 0xff00)>>8);
         lbyte = (byte) (block.size() & 0x00ff);
 
-        byte hbytemsg = (byte) ((id & 0xff00) >> 8);
+        byte hbytemsg = (byte) ((id & 0xff00)>>8);
         byte lbytemsg = (byte) (id & 0x00ff);
 
         index = 0;
