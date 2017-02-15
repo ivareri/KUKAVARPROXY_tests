@@ -12,9 +12,16 @@
 #define READ_NUM 5000
 #define WRITE_NUM 5000
 #define SYNC_NUM 5000
+#define E6AXIS 1
 
 boost::mutex mutex;
 
+void printvar(std::vector<unsigned char> var) {
+	for(auto it = var.begin(); it != var.end(); it++) {
+		std::cout << "'" << *it << "'";
+	}
+	std::cout << std::endl;
+}
 bool timed_read(BoostClientCross *clientcross, int round, int id = 0,
                 bool e6axis = false) {
 
@@ -40,6 +47,7 @@ bool timed_read(BoostClientCross *clientcross, int round, int id = 0,
 
   mutex.lock();
   t.report();
+  std::cout.flush();
   mutex.unlock();
   return true;
 }
@@ -78,6 +86,7 @@ bool timed_write(BoostClientCross *clientcross, int round, int id = 0,
 
   mutex.lock();
   t.report();
+  std::cout.flush();
   mutex.unlock();
   return true;
 }
@@ -90,16 +99,16 @@ bool sync_write_read(BoostClientCross *clientcross, int round, int id = 0,
   std::string out;
 
   if (e6axis) {
-    write_to = { 'A', 'X', 'I', 'S', '_', 'S', 'E', 'T' };
-    read_from = { 'A', 'X', 'I', 'S', '_', 'T', 'E', 'S', 'T' };
+    write_to = { 'A', 'X', 'I', 'S', '_', 'S', 'E', 'T','x' };
+    read_from = { 'A', 'X', 'I', 'S', '_', 'T', 'E', 'S', 'T','x' };
     out = "{E6AXIS: A1 " + boost::lexical_cast<std::string>(int(round%10)) +
 	  ".0, A2 0.0, A3 0.0, A4 "
           "0.0, A5 0.0, A6 0.0, E1 0.0, E2 0.0, E3 0.0, E4 0.0, E5 "
           "0.0, E6 0.0}";
 
   } else {
-    write_to = { 'T', 'E', 'S', 'T', '1' };
-    read_from = { 'T', 'E', 'S', 'T', '2' };
+    write_to = { 'T', 'E', 'S', 'T', '1','x' };
+    read_from = { 'T', 'E', 'S', 'T', '2','x' };
     out = boost::lexical_cast<std::string>(round);
   }
 
@@ -124,9 +133,14 @@ bool sync_write_read(BoostClientCross *clientcross, int round, int id = 0,
       clientcross->formatReadMsg(read_from, id);
   std::vector<unsigned char> reply_read = clientcross->sendMsg(formated_read);
  
-
-  while (reply_read[12] != boost::lexical_cast<unsigned char>(round%10)) {
-    reply_read = clientcross->sendMsg(formated_read);
+  if (e6axis) {
+	  while (reply_read[12] != boost::lexical_cast<unsigned char>(round%10)) {
+	    reply_read = clientcross->sendMsg(formated_read);
+	  }
+  } else {
+	while(boost::lexical_cast<int>(reply_read.data()) != round) {
+ 	  reply_read = clientcross->sendMsg(formated_read);
+	}
   }
 
   t.stop();
@@ -134,6 +148,7 @@ bool sync_write_read(BoostClientCross *clientcross, int round, int id = 0,
 
   mutex.lock();
   t.report();
+  std::cout.flush();
   mutex.unlock();
   return true;
 }
@@ -155,21 +170,21 @@ void *thread_worker(boost::barrier &cur_barier, int t_id) {
   // Read test
   if ((NUM_THREADS == 1) || (t_id != 0)) {
     for (int i = 0; i < READ_NUM; i++) {
-      timed_read(&clientcross, i, t_id, 1);
+      timed_read(&clientcross, i, t_id, E6AXIS);
     }
   }
 
   // write test
   if ((NUM_THREADS == 1) || (t_id != 0)) {
     for (int i = 0; i < WRITE_NUM; i++) {
-      timed_write(&clientcross, i, t_id, 1);
+      timed_write(&clientcross, i, t_id, E6AXIS);
     }
   }
 
   // sync_write_read
   if (t_id == 0) {
     for (int i = 0; i < SYNC_NUM; i++) {
-      sync_write_read(&clientcross, i, t_id, 1);
+      sync_write_read(&clientcross, i, t_id, E6AXIS);
     }
   }
 
@@ -200,6 +215,5 @@ int main() {
     threads[i].join();
   }
 
-  std::cout << "All workers joined" << std::endl;
   return 0;
 }
