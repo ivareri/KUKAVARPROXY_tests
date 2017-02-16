@@ -376,12 +376,12 @@ void loop() {
             mpu.dmpGetAccel(&aa, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-            
-            if ((aaReal.x < lastx - 100) || (aaReal.x > lastx  + 100)) {
+            #define TIMEOUT 8
+            if ((aaReal.x < lastx - TIMEOUT) || (aaReal.x > lastx  + TIMEOUT)) {  
               Serial.print("\n");
-            } else if ((aaReal.y < lasty - 100) || (aaReal.y > lasty  + 100)) {
+            } else if ((aaReal.y < lasty - TIMEOUT) || (aaReal.y > lasty  + TIMEOUT)) {
               Serial.print("\n");
-            } else if ((aaReal.z < lastz - 100) || (aaReal.z > lastz  + 100)) {
+            } else if ((aaReal.z < lastz - TIMEOUT) || (aaReal.z > lastz  + TIMEOUT)) {
               Serial.print("\n");
             }
             lastx = aaReal.x;
@@ -390,7 +390,7 @@ void loop() {
         #endif
         
         // blink LED to indicate activity
-        blinkState = !blinkState;
-        digitalWrite(LED_PIN, blinkState);
+       // blinkState = !blinkState;
+       // digitalWrite(LED_PIN, blinkState);
     }
 }
