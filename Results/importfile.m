@@ -16,7 +16,7 @@ function CSinglethreadE6AXIS = importfile(filename, startRow, endRow)
 %% Initialize variables.
 delimiter = ',';
 if nargin<=2
-    startRow = 2;
+    startRow = 4;
     endRow = inf;
 end
 
@@ -31,7 +31,7 @@ end
 formatSpec = '%f%f%s%f%f%f%[^\n\r]';
 
 %% Open the text file.
-fileID = fopen(filename,'r');
+fileID = fopen(strcat('Raw data/',filename),'r');
 
 %% Read columns of data according to format string.
 % This call is based on the structure of the file used to generate this
