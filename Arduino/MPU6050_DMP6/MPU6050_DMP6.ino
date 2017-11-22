@@ -376,13 +376,14 @@ void loop() {
             mpu.dmpGetAccel(&aa, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-            #define TIMEOUT 8
+            #define TIMEOUT 15
             if ((aaReal.x < lastx - TIMEOUT) || (aaReal.x > lastx  + TIMEOUT)) {  
-              Serial.print("\n");
+              
+              Serial.println("A");
             } else if ((aaReal.y < lasty - TIMEOUT) || (aaReal.y > lasty  + TIMEOUT)) {
-              Serial.print("\n");
+              Serial.println("A");
             } else if ((aaReal.z < lastz - TIMEOUT) || (aaReal.z > lastz  + TIMEOUT)) {
-              Serial.print("\n");
+              Serial.println("A");
             }
             lastx = aaReal.x;
             lasty = aaReal.y;
