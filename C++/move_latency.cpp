@@ -2,21 +2,26 @@
 #include <boost/asio/serial_port.hpp> 
 #include <boost/asio.hpp> 
 #include <boost/timer/timer.hpp>
+#include <chrono>
+#include <thread>
+
 
 #include "blocking_reader.h"
 #include "BoostClientCross.h"
 
 int robotMoving(BoostClientCross *robot) {
-  std::string var("$PRO_ACT");
+  std::string var("$ROB_STOPPED");
   std::vector<unsigned char> read_from(var.begin(), var.end());
 
   std::vector<unsigned char> formated_read = robot->formatReadMsg(read_from, 1);
   std::vector<unsigned char> reply = robot->sendMsg(formated_read);
 
-  if (reply.data() == (unsigned char*) "true") 
-	return true;
+  std::vector<unsigned char> test {'T','R','U'};
+
+  if (reply == test) 
+	  return false;
   
-  return false;
+  return true;
 
 }
 
@@ -33,8 +38,8 @@ int main(int argc, char **argv) {
 
 	// Setup
 	char usb[] = "/dev/ttyACM0";
-	int baud = 38400;
-	int timeout = 100; // ms
+	int baud = 115200;
+	int timeout = 1000; // ms
 	std::string kuka_ip = "10.0.0.1";
 	std::string  kuka_port = "7000";
 	int num_tests = 100;
@@ -59,12 +64,13 @@ int main(int argc, char **argv) {
 	std::vector<unsigned char> write_to(var.begin(), var.end());
 
 	std::string out;
-	out = "{E6AXIS: A1 -31.95492, A2 -103.7478, A3 104.9128, A4 -3.821331E-04, A5 -3.800799E-04, A6 5.252814E-03, E1 1153.259, E2 2800.001, E3 -749.9890, E4 0.0, E5 0.0, E6 0.0}";
-	std::vector<unsigned char> out_vector1(out.begin(), out.end());
-	std::vector<unsigned char> position1 = robot.formatWriteMsg(write_to, out_vector1, 1);
+  out = "{E6AXIS: A1 -31.95492, A2 -98.78010, A3 101.0818, A4 0, A5 0, A6 0, E1 1153.259, E2 2800.001, E3 -749.9890, E4 0.0, E5 0.0, E6 0.0}";
+  std::vector<unsigned char> out_vector1(out.begin(), out.end());
+  std::vector<unsigned char> position1 = robot.formatWriteMsg(write_to, out_vector1, 1);
 
+
+  out = "{E6AXIS: A1 -31.95387, A2 -98.78010, A3 101.0818, A4 28.0, A5 32.0, A6 35.0, E1 1153.259, E2 2800.001, E3 -749.9890, E4 0.0, E5 0.0, E6 0.0}";
 	
-	out = "{E6AXIS: A1 -31.95387, A2 -98.78010, A3 101.0818, A4 3.209918E-02, A5 -1.140894, A6 -2.575621E-02, E1 1153.259, E2 2800.001, E3 -749.9890, E4 0.0, E5 0.0, E6 0.0}";
 	std::vector<unsigned char> out_vector2(out.begin(), out.end());
 	std::vector<unsigned char> position2 = robot.formatWriteMsg(write_to, out_vector2, 2);
 
@@ -72,6 +78,7 @@ int main(int argc, char **argv) {
 
 	for (int i=0; i < num_tests; i++) {
 		// check robot not moving
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		while ( robotMoving(&robot) ) {}
 
 		// clear serial buffer 
@@ -81,28 +88,27 @@ int main(int argc, char **argv) {
 		std::string format = boost::lexical_cast<std::string>(i) + ",%w\n";
 
 		// start timer
-		boost::timer::auto_cpu_timer t(9, format);
+    char d;
 		std::cerr << "Moving robot" << std::endl;
+		boost::timer::auto_cpu_timer t(9, format);
 		// move robot pos[test_num%2]
   		if ( i % 2 ) {
 			robot.sendMsg(position1);
 		} else {
-
 			 robot.sendMsg(position2);
 		}
 
 		// read imu
-		reader.read_char(c);
+		reader.read_char(d);
 
 		// stop timer
 		t.stop();
 
 		// Check if read timed out
-		if (c != '\n') {
+		if (d != 'A') {
 			// Serial read must have timed out.
 			std::cout << "Read timed out!" << std::endl;
 			// wait for keypress
-			std::cin.ignore();
 		} else {
 			// save result
 			t.report();
