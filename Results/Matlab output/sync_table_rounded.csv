@@ -1,4 +1,4 @@
-Language,Type,Threads,Maximum,Minimum,Median,Mean,Deviation
+Language,Type,Threads,Max,Min,Median,Mean,Std. dev.
 Java,INT,1,36.50,12.79,24.07,23.97,0.80
 C++,INT,1,47.61,6.97,24.03,23.92,1.14
 Java,E6AXIS,1,57.71,11.55,23.79,23.97,0.98
