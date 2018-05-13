@@ -1,12 +1,9 @@
 #include <string>
-//#include <boost/asio/serial_port.hpp> 
-//#include <boost/asio.hpp> 
 #include <boost/timer/timer.hpp>
 #include <chrono>
 #include <thread>
 
 #include "posix_serial.c"
-//#include "blocking_reader.h"
 #include "BoostClientCross.h"
 
 int robotMoving(BoostClientCross *robot) {
@@ -52,9 +49,6 @@ int main(int argc, char **argv) {
   unsigned char c[1];
 	
 	// Connect to serial port	
-	//port.open(usb);
-	//port.set_option(boost::asio::serial_port_base::baud_rate(baud));
-  //	blocking_reader reader(port, timeout);
   int fd;
 
   const char *port_name = "/dev/ttyACM0";
@@ -68,11 +62,12 @@ int main(int argc, char **argv) {
 	std::vector<unsigned char> write_to(var.begin(), var.end());
 
 	std::string out;
-  out = "{E6AXIS: A1 -31.95492, A2 -98.78010, A3 101.0818, A4 0, A5 0, A6 0, E1 1153.259, E2 2800.001, E3 -749.9890, E4 0.0, E5 0.0, E6 0.0}";
+  out = "{E6AXIS: A1 -92.22486, A2 -135.1067, A3 122.0934, A4 -9.729492, A5 0.0, A6 12.10981, E1 778.9459, E2 3634.346, E3 -502.3425, E4 0.0, E5 0.0, E6 0.0}";
   std::vector<unsigned char> out_vector1(out.begin(), out.end());
   std::vector<unsigned char> position1 = robot.formatWriteMsg(write_to, out_vector1, 1);
 
-  out = "{E6AXIS: A1 -31.95387, A2 -98.78010, A3 101.0818, A4 28.0, A5 32.0, A6 35.0, E1 1153.259, E2 2800.001, E3 -749.9890, E4 0.0, E5 0.0, E6 0.0}";
+    
+  out = "{E6AXIS: A1 -92.22486, A2 -135.1067, A3 122.0934, A4 -9.729492, A5 35.0, A6 12.10981, E1 778.9459, E2 3634.346, E3 -502.3425, E4 0.0, E5 0.0, E6 0.0}";
 	std::vector<unsigned char> out_vector2(out.begin(), out.end());
 	std::vector<unsigned char> position2 = robot.formatWriteMsg(write_to, out_vector2, 2);
 
@@ -89,8 +84,7 @@ int main(int argc, char **argv) {
 		while ( robotMoving(&robot) ) {}
 
 		// clear serial buffer 
-	//	while ( reader.read_char(c) ) {}
-   while (read(fd,c,1) > 0) {}
+    while (read(fd,c,1) > 0) {}
 
 		// Timer output. 
 		std::string format = boost::lexical_cast<std::string>(i) + ",%w\n";
@@ -111,10 +105,8 @@ int main(int argc, char **argv) {
 		}
 
 		// read imu
-  //	reader.read_char(d);
-  //    boost::asio::read(port, boost::asio::buffer(&d, 1));
-    
     while (read(fd,d,1) == -1) {}
+
 		// stop timer
 		t.stop();
 
