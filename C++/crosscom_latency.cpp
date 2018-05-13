@@ -8,10 +8,10 @@
 #include "BoostClientCross.h"
 #include <boost/algorithm/string.hpp>
 
-#define NUM_THREADS 5
-#define READ_NUM 5000
-#define WRITE_NUM 5000
-#define SYNC_NUM 5000
+#define NUM_THREADS 1
+#define READ_NUM 100
+#define WRITE_NUM 100
+#define SYNC_NUM 100
 #define E6AXIS 1
 
 boost::mutex mutex;
@@ -156,7 +156,7 @@ bool sync_write_read(BoostClientCross *clientcross, int round, int id = 0,
 void *thread_worker(boost::barrier &cur_barier, int t_id) {
 
   // Connect to KRC
-  std::string ip = "10.0.0.1";
+  std::string ip = "10.0.0.101";
   std::string port = "7000";
   BoostClientCross clientcross;
   clientcross.connectSocket(ip, port);
