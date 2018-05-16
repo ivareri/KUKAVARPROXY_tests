@@ -31,5 +31,5 @@ else
     g++ move_latency.cpp -o move_latency -std=c++11 -lboost_system -lboost_thread -lboost_timer -lboost_program_options
 fi
 
-echo "Running 1000 move latency tests"
-./move_latency -r 1000
+echo "Running 5000 move latency tests"
+./move_latency --num_tests 5000

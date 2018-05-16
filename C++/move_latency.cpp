@@ -9,6 +9,10 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
+#define timer timer_class
+#include <boost/progress.hpp>
+#undef timer
+
 int robotMoving(BoostClientCross *robot) {
   std::string var("$ROB_STOPPED");
   std::vector<unsigned char> read_from(var.begin(), var.end());
@@ -53,7 +57,7 @@ int main(int argc, char **argv) {
       return 0;
     }
     if (vm.count("baud")) {
-      num_threads = vm["num_threads"].as<int>();
+      baud = vm["baudrate"].as<int>();
     }
     if (vm.count("num_tests")) {
       num_tests = vm["num_tests"].as<int>();
@@ -98,13 +102,16 @@ int main(int argc, char **argv) {
   std::vector<unsigned char> out_vector2(out.begin(), out.end());
   std::vector<unsigned char> position2 = robot.formatWriteMsg(write_to, out_vector2, 2);
 
-
+  
   // Move robot to inital position
   std::cerr << "Moving to start point" << std::endl;
   robot.sendMsg(position1);
-  
+
+  // Setup progressbar
+  boost::progress_display show_progress(num_tests, std::cerr);
+
+  //Start loop
   std::cout << "Test,Time" << std::endl;
-  
   for (int i=0; i < num_tests; i++) {
     // check robot not moving
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -117,8 +124,8 @@ int main(int argc, char **argv) {
     std::string format = boost::lexical_cast<std::string>(i) + ",%w\n";
     
     unsigned char d[1] = {'\0'};
-    std::cerr << "Moving robot" << std::endl;
-    std::cerr.flush();
+    //std::cerr << "Moving robot" << std::endl;
+    //std::cerr.flush();
     std::cout.flush();
     
     // start timer
@@ -145,11 +152,11 @@ int main(int argc, char **argv) {
     } else {
       // save result
       t.report();
-      std::cerr << "Got byte :" << d[0] << std::endl;
-      std::cerr.flush();
+      //std::cerr << "Got byte :" << d[0] << std::endl;
+      //std::cerr.flush();
       std::cout.flush();
     }
-    
+    ++show_progress;
   } // end for loop
   
   // close serialport
