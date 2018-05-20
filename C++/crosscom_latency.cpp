@@ -8,11 +8,9 @@
 #include "BoostClientCross.h"
 #include <boost/algorithm/string.hpp>
 
-#define NUM_THREADS 1
-#define READ_NUM 100
-#define WRITE_NUM 100
-#define SYNC_NUM 100
-#define E6AXIS 1
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
+
 
 boost::mutex mutex;
 
@@ -23,7 +21,7 @@ void printvar(std::vector<unsigned char> var) {
 	std::cout << std::endl;
 }
 bool timed_read(BoostClientCross *clientcross, int round, int id = 0,
-                bool e6axis = false) {
+                bool e6axis = false, int num_threads = 1) {
 
   std::vector<unsigned char> read_from;
   if (e6axis)
@@ -33,7 +31,7 @@ bool timed_read(BoostClientCross *clientcross, int round, int id = 0,
     read_from = { 'T', 'E', 'S', 'T', '1' };
 
   std::string format = boost::lexical_cast<std::string>(id) + ", " +
-                       boost::lexical_cast<std::string>(NUM_THREADS) +
+                       boost::lexical_cast<std::string>(num_threads) +
                        ", Read, " + boost::lexical_cast<std::string>(e6axis) +
                        ", " + boost::lexical_cast<std::string>(round) +
                        ", %w\n";
@@ -53,7 +51,7 @@ bool timed_read(BoostClientCross *clientcross, int round, int id = 0,
 }
 
 bool timed_write(BoostClientCross *clientcross, int round, int id = 0,
-                 bool e6axis = false) {
+                 bool e6axis = false, int num_threads = 1) {
 
   std::vector<unsigned char> write_to;
   std::string out;
@@ -71,7 +69,7 @@ bool timed_write(BoostClientCross *clientcross, int round, int id = 0,
 
   std::vector<unsigned char> out_vector(out.begin(), out.end());
   std::string format = boost::lexical_cast<std::string>(id) + ", " +
-                       boost::lexical_cast<std::string>(NUM_THREADS) +
+                       boost::lexical_cast<std::string>(num_threads) +
                        ", Write, " + boost::lexical_cast<std::string>(e6axis) +
                        ", " + boost::lexical_cast<std::string>(round) +
                        ", %w\n";
@@ -92,7 +90,7 @@ bool timed_write(BoostClientCross *clientcross, int round, int id = 0,
 }
 
 bool sync_write_read(BoostClientCross *clientcross, int round, int id = 0,
-                     bool e6axis = false) {
+                     bool e6axis = false, int num_threads = 1) {
 
   std::vector<unsigned char> write_to;
   std::vector<unsigned char> read_from;
@@ -115,7 +113,7 @@ bool sync_write_read(BoostClientCross *clientcross, int round, int id = 0,
   std::vector<unsigned char> out_vector(out.begin(), out.end());
 
   std::string format = boost::lexical_cast<std::string>(id) + ", " +
-                       boost::lexical_cast<std::string>(NUM_THREADS) +
+                       boost::lexical_cast<std::string>(num_threads) +
                        ", sync_write_read, " +
                        boost::lexical_cast<std::string>(e6axis) + ", " +
                        boost::lexical_cast<std::string>(round) + ", %w\n";
@@ -153,7 +151,7 @@ bool sync_write_read(BoostClientCross *clientcross, int round, int id = 0,
   return true;
 }
 
-void *thread_worker(boost::barrier &cur_barier, int t_id) {
+void *thread_worker(boost::barrier &cur_barier, int t_id, int num_threads, int num_tests, bool e6axis) {
 
   // Connect to KRC
   std::string ip = "10.0.0.101";
@@ -168,23 +166,23 @@ void *thread_worker(boost::barrier &cur_barier, int t_id) {
   cur_barier.wait();
 
   // Read test
-  if ((NUM_THREADS == 1) || (t_id != 0)) {
-    for (int i = 0; i < READ_NUM; i++) {
-      timed_read(&clientcross, i, t_id, E6AXIS);
+  if ((num_threads == 1) || (t_id != 0)) {
+    for (int i = 0; i < num_tests; i++) {
+      timed_read(&clientcross, i, t_id, e6axis, num_threads);
     }
   }
 
   // write test
-  if ((NUM_THREADS == 1) || (t_id != 0)) {
-    for (int i = 0; i < WRITE_NUM; i++) {
-      timed_write(&clientcross, i, t_id, E6AXIS);
+  if ((num_threads == 1) || (t_id != 0)) {
+    for (int i = 0; i < num_tests; i++) {
+      timed_write(&clientcross, i, t_id, e6axis, num_threads);
     }
   }
 
   // sync_write_read
   if (t_id == 0) {
-    for (int i = 0; i < SYNC_NUM; i++) {
-      sync_write_read(&clientcross, i, t_id, E6AXIS);
+    for (int i = 0; i < num_tests; i++) {
+      sync_write_read(&clientcross, i, t_id, e6axis, num_threads);
     }
   }
 
@@ -192,15 +190,47 @@ void *thread_worker(boost::barrier &cur_barier, int t_id) {
   clientcross.disconnectSocket();
 }
 
-int main() {
-
+int main(int argc, char **argv) {
+  // Set defaults
+  int num_threads = 1;
+  int num_tests = 100;
+  bool e6axis = false;
+  // Parse options
+  try {
+    po::options_description desc("Allowed options");
+    desc.add_options()
+      ("help,h", "produce help message")
+      ("num_threads,t", po::value<int>(), "set number of threads, default=1")
+      ("num_tests,r", po::value<int>(), "set number of tests, default=100")
+      ("e6axis,e", po::value<bool>(), "true is e6axis, false is int, default=false");
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+    if (vm.count("help")) {
+      std::cout << desc << std::endl;
+      return 0;
+    }
+    if (vm.count("num_threads")) {
+      num_threads = vm["num_threads"].as<int>();
+    }
+    if (vm.count("num_tests")) {
+      num_tests = vm["num_tests"].as<int>();
+    } 
+    if (vm.count("e6axis")) {
+      e6axis = vm["e6axis"].as<bool>();
+    }
+  }
+  catch(std::exception& e) {
+    std::cerr << "error:" << e.what() << "\n";
+    return 1;
+  }
   std::cout << "starting workers" << std::endl;
 
-  boost::thread threads[NUM_THREADS];
-  boost::barrier bar(NUM_THREADS + 1);
+  boost::thread threads[num_threads];
+  boost::barrier bar(num_threads + 1);
 
-  for (int i = 0; i < NUM_THREADS; i++) {
-    threads[i] = boost::thread(boost::bind(thread_worker, boost::ref(bar), i));
+  for (int i = 0; i < num_threads; i++) {
+    threads[i] = boost::thread(boost::bind(thread_worker, boost::ref(bar), i, num_threads, num_tests, e6axis));
   }
 
   mutex.lock();
@@ -211,7 +241,7 @@ int main() {
 
   bar.wait();
 
-  for (int i = 0; i < NUM_THREADS; i++) {
+  for (int i = 0; i < num_threads; i++) {
     threads[i].join();
   }
 
